@@ -1,7 +1,12 @@
 (ns wutchamean.core-test
-  (:require [clojure.test :refer :all]
+  (:require [midje.sweet :refer :all]
             [wutchamean.core :refer :all]))
 
-(deftest a-test
-  (testing "FIXME, I fail."
-    (is (= 0 1))))
+(def grammar
+  {:grammar {
+    :animal ["dog" "cat" "hunted wumpus" "superb lyrebird of southern australia" "Australian Bear" "Austrian Cat Southern-style"]
+    :person ["Bill" "Kris" "Trevor" "Cat Woman" "Dogwoman" "Bird Man" "hunter" "Australian" "Austrian" "Warren Beatty"]}})
+
+(fact "strings get split"
+  (split-words-in-string (-> grammar :grammar :animal)) 
+  => 1)
