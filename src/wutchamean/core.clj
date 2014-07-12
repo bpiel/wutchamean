@@ -1,5 +1,5 @@
 (ns wutchamean.core
-  (:require [clojure.string :refer [split]]))
+  (:require [clojure.string :refer [split lower-case]]))
 
 
 (defn process-grammar
@@ -21,9 +21,9 @@
   [word-list]
   (apply concat (map (fn [tuple] 
                          (map (fn [word] 
-                                  (vector word (second tuple) (nth tuple 2))) 
+                                  [(lower-case word) {:string (second tuple) :index (nth tuple 2)}])
                               (first tuple)))
-                      (map-indexed #(vector (split %2 #" ") %2 %)
+                      (map-indexed #(vector (split %2 #"[^\w\d']+") %2 %)
                            word-list))))
 
 (defn match-tokens
