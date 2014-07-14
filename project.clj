@@ -3,7 +3,8 @@
   :url ""
   :license {:name "MIT License"
             :url "http://www.opensource.org/licenses/mit-license.php"}
-  :dependencies [[org.clojure/clojure "1.6.0"]]
+  :dependencies [[org.clojure/clojure "1.6.0"]
+                 [incanter "1.5.5"]]
   :profiles {:uberjar {:aot :all}
              :dev {:dependencies [[midje "1.6.3"]]
                    :plugins [[lein-midje "3.1.3"]]}})

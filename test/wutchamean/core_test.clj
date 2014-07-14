@@ -58,6 +58,11 @@
       
       )
 
+(fact "match token"
+      (match-token (process-grammar (:grammar grammar)) "hutne") 
+      => [["hunted" {:class :animal, :index 2, :string "hunted wumpus"}]
+          ["hunter" {:class :person, :index 6, :string "hunter"}]])
+
 (fact "tokenize"
       (tokenize (process-grammar (:grammar grammar)) "Dog cat wumpus hunter" ) => 
       {0 [{:matches [["dog" {:class :animal
@@ -75,15 +80,18 @@
                              :index 5
                              :string "Austrian Cat Southern-style"}]]
            :original "cat"
-           :position 1}],
+           :position 1}]
        2 [{:matches [["wumpus" {:class :animal
                                 :index 2
                                 :string "hunted wumpus"}]]
            :original "wumpus"
-           :position 2}],
-       3 [{:matches [["hunter" {:class :person
+           :position 2}]
+       3 [{:matches [["hunted" {:class :animal
+                                :index 2
+                                :string "hunted wumpus"}]
+                     ["hunter" {:class :person
                                 :index 6
                                 :string "hunter"}]]
            :original "hunter"
            :position 3}]})
-
+      

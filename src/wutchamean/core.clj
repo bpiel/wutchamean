@@ -1,5 +1,6 @@
 (ns wutchamean.core
-  (:require [clojure.string :refer [split lower-case]]))
+  (:require [clojure.string :refer [split lower-case]]
+            [incanter.stats :refer :all]))
 
 
 ;(group-by first (split-words-in-string (second rule)))
@@ -27,7 +28,11 @@
 (defn match-token
   "Match a word to a set of tokens"
   [processed-grammar word]
-  (get processed-grammar (lower-case word)))
+  (apply concat
+          (map second
+               (filter #(> (/ (count (first %)) 2)
+                          (damerau-levenshtein-distance (lower-case word) (first %)))
+                       (seq processed-grammar)))))
 
 (defn tokenize
   "Split string into tokens"
