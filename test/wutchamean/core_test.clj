@@ -7,25 +7,25 @@
              :animal ["dog" "cat" "hunted wumpus" "superb lyrebird of southern australia" "Australian Bear" "Austrian Cat Southern-style"]
              :person ["Bill" "Kris" "Trevor" "Cat Woman" "Dogwoman" "Bird Man" "hunter" "Australian" "Austrian" "Warren Beatty"]}})
 
-#_(fact "strings get split"
-        (split-words-in-string-list (-> grammar :grammar :animal)) 
+(fact "strings get split"
+        (split-words-in-phrase-list (-> grammar :grammar :animal)) 
         => [["dog" {:index 0, :string "dog"}]
-            ["cat" {:index 1, :string "cat"}]
-            ["hunted" {:index 2, :string "hunted wumpus"}]
-            ["wumpus" {:index 2, :string "hunted wumpus"}]
-            ["superb" {:index 3, :string "superb lyrebird of southern australia"}]
-            ["lyrebird" {:index 3, :string "superb lyrebird of southern australia"}]
-            ["of" {:index 3, :string "superb lyrebird of southern australia"}]
+            ["cat" {:index 0, :string "cat"}]
+            ["hunted" {:index 0, :string "hunted wumpus"}]
+            ["wumpus" {:index 1, :string "hunted wumpus"}]
+            ["superb" {:index 0, :string "superb lyrebird of southern australia"}]
+            ["lyrebird" {:index 1, :string "superb lyrebird of southern australia"}]
+            ["of" {:index 2, :string "superb lyrebird of southern australia"}]
             ["southern" {:index 3, :string "superb lyrebird of southern australia"}]
-            ["australia" {:index 3, :string "superb lyrebird of southern australia"}]
-            ["australian" {:index 4, :string "Australian Bear"}]
-            ["bear" {:index 4, :string "Australian Bear"}]
-            ["austrian" {:index 5, :string "Austrian Cat Southern-style"}]
-            ["cat" {:index 5, :string "Austrian Cat Southern-style"}]
-            ["southern" {:index 5, :string "Austrian Cat Southern-style"}]
-            ["style" {:index 5, :string "Austrian Cat Southern-style"}]])
+            ["australia" {:index 4, :string "superb lyrebird of southern australia"}]
+            ["australian" {:index 0, :string "Australian Bear"}]
+            ["bear" {:index 1, :string "Australian Bear"}]
+            ["austrian" {:index 0, :string "Austrian Cat Southern-style"}]
+            ["cat" {:index 1, :string "Austrian Cat Southern-style"}]
+            ["southern" {:index 2, :string "Austrian Cat Southern-style"}]
+            ["style" {:index 3, :string "Austrian Cat Southern-style"}]])
 
-(fact "process-grammar"
+#_(fact "process-grammar"
       (process-grammar (:grammar grammar))
       => {"australia" [["australia" {:class :animal, :index 3, :string "superb lyrebird of southern australia"}]],
           "australian" [["australian" {:class :person, :index 7, :string "Australian"}] 
@@ -58,12 +58,12 @@
       
       )
 
-(fact "match token"
+#_(fact "match token"
       (match-token (process-grammar (:grammar grammar)) "hutne") 
       => [["hunted" {:class :animal, :index 2, :string "hunted wumpus"}]
           ["hunter" {:class :person, :index 6, :string "hunter"}]])
 
-(fact "tokenize"
+#_(fact "tokenize"
       (tokenize (process-grammar (:grammar grammar)) "Dog cat wumpus hunter" ) => 
       {0 [{:matches [["dog" {:class :animal
                              :index 0

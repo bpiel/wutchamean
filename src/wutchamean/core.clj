@@ -5,15 +5,15 @@
 
 ;(group-by first (split-words-in-string (second rule)))
 
-(defn split-words-in-string-list
-  [word-list]
+(defn split-words-in-phrase-list
+  [phrase-list]
   (apply concat
          (map (fn [tuple] 
-                (map (fn [word] 
-                       [(lower-case word) {:string (second tuple) :index (nth tuple 2)}])
+                (map-indexed (fn [idx word] 
+                       [(lower-case word) {:string (second tuple) :index idx}])
                      (first tuple)))
-              (map-indexed #(vector (split %2 #"[^\w\d']+") %2 %)
-                           word-list))))
+              (map #(vector (split % #"[^\w\d']+") %)
+                           phrase-list))))
 
 (defn process-grammar
   [grammar]
@@ -21,7 +21,7 @@
             (apply concat (map (fn [rule]
                                  (map (fn [word-pair]
                                         (assoc-in word-pair [1 :class] (first rule)))
-                                      (split-words-in-string-list (second rule))))
+                                      (split-words-in-phrase-list (second rule))))
                                (seq grammar)))))
 
 
