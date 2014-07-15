@@ -24,15 +24,20 @@
                                       (split-words-in-phrase-list (second rule))))
                                (seq grammar)))))
 
+(defn calculate-confidence [word match]
+  (double (/ (- (count match) 
+               (damerau-levenshtein-distance (lower-case word) 
+                                             match))
+            (count match))))
 
 (defn match-token
   "Match a word to a set of tokens"
   [processed-grammar word]
-  (apply concat
-          (map second
-               (filter #(> (/ (count (first %)) 2)
-                          (damerau-levenshtein-distance (lower-case word) (first %)))
-                       (seq processed-grammar)))))
+  (filter #(>= (:confidence %) 0.5)
+          (map #(hash-map :confidence (calculate-confidence word (first %))
+                          :matches (second %)
+                          :match (first %))
+               (seq processed-grammar))))
 
 (defn tokenize
   "Split string into tokens"
