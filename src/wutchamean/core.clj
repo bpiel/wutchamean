@@ -3,8 +3,6 @@
             [incanter.stats :refer :all]))
 
 
-;(group-by first (split-words-in-string (second rule)))
-
 (defn split-words-in-phrase-list
   [phrase-list]
   (apply concat

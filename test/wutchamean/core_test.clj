@@ -31,7 +31,7 @@
       )
 
 
-;no idea why this isn't working
+
 (fact "match token"
       (match-token (process-grammar (:grammar grammar)) "hutne")
       => [{:confidence 0.6666666666666667, :match "hunted", :matches [["hunted" {:class :animal, :index 0, :string "hunted wumpus"}]]} {:confidence 0.6666666666666667, :match "hunter", :matches [["hunter" {:class :person, :index 0, :string "hunter"}]]}]
