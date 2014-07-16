@@ -35,7 +35,7 @@
   [processed-grammar word]
   (filter #(>= (:confidence %) 0.5)
           (map #(hash-map :confidence (calculate-confidence word (first %))
-                          :matches (second %)
+                          :matches (-> % second second)
                           :match (first %))
                (seq processed-grammar))))
 
