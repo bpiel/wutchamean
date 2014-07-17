@@ -126,7 +126,7 @@
 
 (defn assemble-phrases-recur
   [tokens phrase-maps last-batch iterations]
-  (if (and (< 0 iterations)
+  (if (and (<= 0 iterations)
            (not (empty? last-batch)))
     (if-let [new-phrase-maps (->> last-batch
                                   (expand-phrase-maps tokens)
@@ -153,25 +153,29 @@
     (filter #(> (:confidence %) 0.5) 
             (assemble-phrases-recur tokens stub-phrase-maps stub-phrase-maps 10))))
 
-(defn no-conflict [check-phrase phrase-seq]
+(defn has-conflict [check-phrase phrase-seq]
   (if (empty? phrase-seq)
-    true
-    (let [first-phrase (first phrase-seq)]
-      (if (or (< (:start-pos check-phrase) (:start-pos first-phrase) (:end-pos check-phrase))
-              (< (:start-pos check-phrase) (:end-pos first-phrase) (:end-pos check-phrase)))
-        false
+    false
+    (let [first-phrase (first phrase-seq)]      
+      (if (or (<= (:start-pos check-phrase) (:start-pos first-phrase) (:end-pos check-phrase))
+              (<= (:start-pos check-phrase) (:end-pos first-phrase) (:end-pos check-phrase)))
+        true
         (recur check-phrase (rest phrase-seq))))))
 
-(defn pick-most-confident-sequences [remaining-phrases chosen-phrases first-skip]
+(defn pick-most-confident-phrases [remaining-phrases chosen-phrases first-skip]
   (if (empty? remaining-phrases)
     [chosen-phrases first-skip]
     (let [first-phrase (first remaining-phrases)
-          fits (no-conflict first-phrase chosen-phrases)]
-        (if fits
+          conflict (has-conflict first-phrase chosen-phrases)]
+        (if (not conflict)
           (recur (rest remaining-phrases) (cons first-phrase chosen-phrases) first-skip)
           (recur (rest remaining-phrases) chosen-phrases (or first-skip first-phrase))))))
 
-
+#_(defn get-phrase-sequences [sorted-phrases phrase-seqs first-skip iterations]
+  (if (<= 0 iterations)
+      (let [[new-chosen new-first-skip] (pick-most-confident-phrases sorted-phrases [first-skip] first-skip)]
+           (if new-first-skip
+             (recur sorted-phrases (concat))))))
 
 (defn guess-phrase-sequences-from-assembled [processed-grammar assembled-phrases]
    
