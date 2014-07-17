@@ -156,7 +156,7 @@
 (defn has-conflict [check-phrase phrase-seq]
   (if (empty? phrase-seq)
     false
-    (let [first-phrase (first phrase-seq)]      
+    (let [first-phrase (first phrase-seq)]
       (if (or (<= (:start-pos check-phrase) (:start-pos first-phrase) (:end-pos check-phrase))
               (<= (:start-pos check-phrase) (:end-pos first-phrase) (:end-pos check-phrase)))
         true
@@ -184,14 +184,16 @@
 (defn get-phrase-sequences [sorted-phrases phrase-seqs first-skip iterations]
   (if (<= 0 iterations)
     (let [[new-chosen new-first-skip] (pick-most-confident-phrases sorted-phrases 
-                                                                   [first-skip] 
+                                                                   (if (nil? first-skip) nil [first-skip])
                                                                    nil 
                                                                    (or (:confidence first-skip) 2))]
       (if new-first-skip
         (recur sorted-phrases 
                (concat phrase-seqs new-chosen)
                new-first-skip
-               (dec iterations))))))
+               (dec iterations))
+        phrase-seqs))
+    phrase-seqs))
 
 (defn guess-phrase-sequences-from-assembled [processed-grammar assembled-phrases]
   
