@@ -472,7 +472,7 @@
                             ]
             ]
         (get-phrase-sequences sorted-phrases [] nil 0))
-      => [{:class :animal,
+      => [[{:class :animal,
            :confidence 0.6666666666666667,
            :end-pos 1,
            :original "cart",
@@ -492,5 +492,29 @@
            :original "wompus hutne",
            :phrase "hunted wumpus",
            :start-pos 2,
-           :words ["wompus" "hutne"]}]
+           :words ["wompus" "hutne"]}]]
       )
+
+(fact "calculate-phrase-seq-confidence"
+      (calculate-phrase-seq-confidence  [{:class :animal,
+                                          :confidence 0.6666666666666667,
+                                          :end-pos 1,
+                                          :original "cart",
+                                          :phrase "cat",
+                                          :start-pos 1,
+                                          :words ["cart"]}
+                                         {:class :animal,
+                                          :confidence 1.0,
+                                          :end-pos 0,
+                                          :original "Dog",
+                                          :phrase "dog",
+                                          :start-pos 0,
+                                          :words ["Dog"]}
+                                         {:class :animal,
+                                          :confidence 0.6923076923076923,
+                                          :end-pos 3,
+                                          :original "wompus hutne",
+                                          :phrase "hunted wumpus",
+                                          :start-pos 2,
+                                          :words ["wompus" "hutne"]}])
+      => 0.6567567567567567)

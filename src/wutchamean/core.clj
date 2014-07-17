@@ -181,7 +181,8 @@
                  first-skip)
                max-skip-confidence)))))
 
-(defn get-phrase-sequences [sorted-phrases phrase-seqs first-skip iterations]
+(defn get-phrase-sequences
+  [sorted-phrases phrase-seqs first-skip iterations]
   (if (<= 0 iterations)
     (let [[new-chosen new-first-skip] (pick-most-confident-phrases sorted-phrases 
                                                                    (if (nil? first-skip) nil [first-skip])
@@ -189,13 +190,30 @@
                                                                    (or (:confidence first-skip) 2))]
       (if new-first-skip
         (recur sorted-phrases 
-               (concat phrase-seqs new-chosen)
+               (conj phrase-seqs new-chosen)
                new-first-skip
                (dec iterations))
         phrase-seqs))
     phrase-seqs))
 
+(defn calculate-phrase-seq-confidence 
+  [phrase-seq]
+  (let [sorted (sort #(< (:start-pos %)(:start-pos %2)) phrase-seq)
+        [expected-vec actual-vec] (reduce #(vector (concat (first %)(:original %2))
+                                           (concat (second %)(:phrase %2)))
+                                  [[] []]
+                                  sorted)
+        expected (join " " expected-vec)
+        actual (join " " actual-vec)
+        expected-sorted (join " " (sort expected-vec))
+        actual-sorted (join " " (sort actual-vec))]
+    
+    (max (calculate-distance expected actual)
+         (* 0.9 (calculate-distance expected-sorted actual-sorted)))))
+
+
 (defn guess-phrase-sequences-from-assembled [processed-grammar assembled-phrases]
-  
-  
+  (map #(hash-map :confidence (calculate-phrase-seq-confidence %)
+         ))
+   
   )
