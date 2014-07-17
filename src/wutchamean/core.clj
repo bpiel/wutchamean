@@ -212,8 +212,8 @@
          (* 0.9 (calculate-distance expected-sorted actual-sorted)))))
 
 
-(defn guess-phrase-sequences-from-assembled [processed-grammar assembled-phrases]
-  (map #(hash-map :confidence (calculate-phrase-seq-confidence %)
-         ))
-   
-  )
+(defn order-by-confidence-phrase-sequences-from-assembled [assembled-phrases]
+  (sort #(< (:confidence %)(:confidence %2))
+        (map #(hash-map :confidence (calculate-phrase-seq-confidence %)
+                        :phrase-seq %)
+             assembled-phrases)))
