@@ -374,3 +374,29 @@
            :start-pos 2,
            :words ["wompus" "hutne"]}] )
 
+(fact "no conflict -- inside"
+      (no-conflict {:start-pos 3 :end-pos 10}
+                   [{:start-pos 12 :end-pos 14}
+                    {:start-pos 5 :end-pos 9}])
+      => false)
+
+(fact "no conflict -- left"
+      (no-conflict {:start-pos 3 :end-pos 10}
+                   [{:start-pos 12 :end-pos 14}
+                    {:start-pos 1 :end-pos 4}])
+      => false)
+
+(fact "no conflict -- left"
+      (no-conflict {:start-pos 3 :end-pos 10}
+                   [{:start-pos 12 :end-pos 14}
+                    {:start-pos 7 :end-pos 12}])
+      => false)
+
+(fact "no conflict -- there is no conflict"
+      (no-conflict {:start-pos 3 :end-pos 10}
+                   [{:start-pos 12 :end-pos 14}
+                    {:start-pos 12 :end-pos 15}])
+      => true)
+
+
+
