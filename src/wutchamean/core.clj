@@ -10,7 +10,7 @@
   (apply concat
          (map (fn [tuple] 
                 (map-indexed (fn [idx word] 
-                       [(lower-case word) {:string (second tuple) :index idx}])
+                       [(lower-case word) {:phrase (second tuple) :index idx}])
                      (first tuple)))
               (map #(vector (split % #"[^\w\d']+") %)
                            phrase-list))))
@@ -34,9 +34,9 @@
   "Match a word to a set of tokens"
   [processed-grammar word]
   (filter #(>= (:confidence %) 0.5)
-          (map #(hash-map :confidence (calculate-confidence word (first %))
-                          :matches (-> % second second)
-                          :match (first %))
+          (map (fn [[word-match phrase-match]] (hash-map :confidence (calculate-confidence word word-match)
+                          :matches (map second phrase-match)
+                          :match word-match))
                (seq processed-grammar))))
 
 (defn tokenize
