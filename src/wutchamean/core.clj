@@ -10,10 +10,10 @@
   (apply concat
          (map (fn [tuple] 
                 (map-indexed (fn [idx word] 
-                       [(lower-case word) {:phrase (second tuple) :index idx}])
-                     (first tuple)))
+                               [(lower-case word) {:phrase (second tuple) :index idx}])
+                             (first tuple)))
               (map #(vector (split % #"[^\w\d']+") %)
-                           phrase-list))))
+                   phrase-list))))
 
 (defn process-grammar
   [grammar]
@@ -26,24 +26,43 @@
 
 (defn calculate-confidence [word match]
   (double (/ (- (count match) 
-               (damerau-levenshtein-distance (lower-case word) 
-                                             match))
-            (count match))))
+                (damerau-levenshtein-distance (lower-case word) 
+                                              match))
+             (count match))))
 
 (defn match-token
   "Match a word to a set of tokens"
   [processed-grammar word]
   (filter #(>= (:confidence %) 0.5)
           (map (fn [[word-match phrase-match]] (hash-map :confidence (calculate-confidence word word-match)
-                          :matches (map second phrase-match)
-                          :match word-match))
+                                                         :matches (map second phrase-match)
+                                                         :match word-match))
                (seq processed-grammar))))
 
 (defn tokenize
   "Split string into tokens"
   [processed-grammar string]
-  (group-by :position
-            (map-indexed #(hash-map :position %
+  (into {} (map-indexed #(vector % { :position %
                                     :original %2
-                                    :matches (match-token processed-grammar %2))
-                         (split string #"[^\d\w']+"))))
+                                    :matches (match-token processed-grammar %2)})
+                        (split string #"[^\d\w']+"))))
+
+(defn get-stub-phrases-from-tokens
+  "Assemble tokens into phrases"
+  [processed-grammar tokens]
+  (apply concat 
+         (apply concat 
+                (map (fn [[position token]]
+                       (map (fn [word-match]
+                              (map (fn [phrase-match]
+                                     (hash-map :phrase (:phrase phrase-match)
+                                               :start-pos (:position token)
+                                               :end-pos (:position token)
+                                               :phrase-index (:index phrase-match)
+                                               :confidence (:confidence word-match)
+                                               :class (:class phrase-match)
+                                               :original (:original token)
+                                               :words [(:original token)]))
+                                   (:matches word-match)))
+                            (:matches token)))       
+                     (seq tokens)))))

@@ -133,3 +133,64 @@
              :matches [{:class :person, :index 0, :phrase "hunter"}]}],
            :original "hutne",
            :position 3}})
+
+(fact "assemble phrases"
+      (let [processed-grammar (process-grammar (:grammar grammar))]
+        (assemble-phrases processed-grammar
+                          (tokenize processed-grammar "Dog cart wompus hutne"))
+        => [{:class :animal,
+             :confidence 1.0,
+             :end-pos 0,
+             :original "Dog",
+             :phrase "dog",
+             :phrase-index 0,
+             :start-pos 0,
+             :words ["Dog"]}
+            {:class :person,
+             :confidence 0.6666666666666667,
+             :end-pos 1,
+             :original "cart",
+             :phrase "Cat Woman",
+             :phrase-index 0,
+             :start-pos 1,
+             :words ["cart"]}
+            {:class :animal,
+             :confidence 0.6666666666666667,
+             :end-pos 1,
+             :original "cart",
+             :phrase "cat",
+             :phrase-index 0,
+             :start-pos 1,
+             :words ["cart"]}
+            {:class :animal,
+             :confidence 0.6666666666666667,
+             :end-pos 1,
+             :original "cart",
+             :phrase "Austrian Cat Southern-style",
+             :phrase-index 1,
+             :start-pos 1,
+             :words ["cart"]}
+            {:class :animal,
+             :confidence 0.8333333333333333,
+             :end-pos 2,
+             :original "wompus",
+             :phrase "hunted wumpus",
+             :phrase-index 1,
+             :start-pos 2,
+             :words ["wompus"]}
+            {:class :animal,
+             :confidence 0.6666666666666667,
+             :end-pos 3,
+             :original "hutne",
+             :phrase "hunted wumpus",
+             :phrase-index 0,
+             :start-pos 3,
+             :words ["hutne"]}
+            {:class :person,
+             :confidence 0.6666666666666667,
+             :end-pos 3,
+             :original "hutne",
+             :phrase "hunter",
+             :phrase-index 0,
+             :start-pos 3,
+             :words ["hutne"]}]))
