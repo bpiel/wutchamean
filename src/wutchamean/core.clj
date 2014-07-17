@@ -197,7 +197,7 @@
     phrase-seqs))
 
 (defn calculate-phrase-seq-confidence 
-  [phrase-seq]
+  [phrase-seq]  
   (let [sorted (sort #(< (:start-pos %)(:start-pos %2)) phrase-seq)
         [expected-vec actual-vec] (reduce #(vector (concat (first %)(:original %2))
                                            (concat (second %)(:phrase %2)))
@@ -215,5 +215,28 @@
 (defn order-by-confidence-phrase-sequences-from-assembled [assembled-phrases]
   (sort #(< (:confidence %)(:confidence %2))
         (map #(hash-map :confidence (calculate-phrase-seq-confidence %)
-                        :phrase-seq %)
+                        :phrase-seq (sort (fn [ps1 ps2] (< (:start-pos ps1)(:start-pos ps2))) %))
              assembled-phrases)))
+
+(defn phrase-seq-to-guessed-string
+    [phrase-seq]
+    (join " " (map :phrase phrase-seq)))
+
+(defn string-to-guessed-string
+  [grammar string]
+  (let [processed-grammar (process-grammar (:grammar grammar))]
+  (map #(-> % :phrase-seq phrase-seq-to-guessed-string)
+         (order-by-confidence-phrase-sequences-from-assembled 
+           (get-phrase-sequences
+             (sort #(> (:confidence %) (:confidence %2))
+           (assemble-phrases processed-grammar
+                             (tokenize processed-grammar
+                                      string)
+                             )
+           )
+             [] nil 0
+           )
+         )
+    )
+  )
+  )

@@ -545,13 +545,6 @@
       => [{:confidence 0.6567567567567567,
            :phrase-seq
            [{:class :animal,
-             :confidence 0.6666666666666667,
-             :end-pos 1,
-             :original "cart",
-             :phrase "cat",
-             :start-pos 1,
-             :words ["cart"]}
-            {:class :animal,
              :confidence 1.0,
              :end-pos 0,
              :original "Dog",
@@ -559,9 +552,45 @@
              :start-pos 0,
              :words ["Dog"]}
             {:class :animal,
+             :confidence 0.6666666666666667,
+             :end-pos 1,
+             :original "cart",
+             :phrase "cat",
+             :start-pos 1,
+             :words ["cart"]}
+            {:class :animal,
              :confidence 0.6923076923076923,
              :end-pos 3,
              :original "wompus hutne",
              :phrase "hunted wumpus",
              :start-pos 2,
              :words ["wompus" "hutne"]}]}])
+
+(fact "phrase-seq-to-guessed-string"
+      (phrase-seq-to-guessed-string [{:class :animal,
+                                      :confidence 1.0,
+                                      :end-pos 0,
+                                      :original "Dog",
+                                      :phrase "dog",
+                                      :start-pos 0,
+                                      :words ["Dog"]}
+                                     {:class :animal,
+                                      :confidence 0.6666666666666667,
+                                      :end-pos 1,
+                                      :original "cart",
+                                      :phrase "cat",
+                                      :start-pos 1,
+                                      :words ["cart"]}
+                                     {:class :animal,
+                                      :confidence 0.6923076923076923,
+                                      :end-pos 3,
+                                      :original "wompus hutne",
+                                      :phrase "hunted wumpus",
+                                      :start-pos 2,
+                                      :words ["wompus" "hutne"]}]
+                                    )
+      => "dog cat hunted wumpus")
+
+(fact "string-to-guessed-string"
+      (string-to-guessed-string grammar "Dog cart wompus hutne")
+      => ["dog cat hunted wumpus"])
