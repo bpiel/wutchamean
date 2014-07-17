@@ -103,7 +103,8 @@
                                         :right)))]
       (assoc new-phrase-map        
         :parent-confidence (:confidence phrase-map)
-        :confidence nil))))
+        :confidence nil
+	:original (join " " (:words new-phrase-map))))))
 
 (defn expand-phrase-maps
   [tokens phrase-maps]
@@ -126,6 +127,9 @@
                                 (filter #(or (-> % :parent-confidence nil?) (> (:confidence %) (* 0.9 (:parent-confidence %)))))
                                 (filter #(< 0 (:confidence %))))]
       (do 
+        (println)
+	(println "assemble-phrases-recur -- before recur")
+	(println)
         (clojure.pprint/write new-phrase-maps)
         (recur tokens (concat phrase-maps new-phrase-maps) (dec iterations)))
       phrase-maps)
@@ -143,5 +147,5 @@
     (println)			      
     (clojure.pprint/write stub-phrase-maps)
     (filter #(> (:confidence %) 0.5) 
-            (assemble-phrases-recur tokens stub-phrase-maps 0))))
+            (assemble-phrases-recur tokens stub-phrase-maps 1))))
 
