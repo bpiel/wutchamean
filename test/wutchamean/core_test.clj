@@ -201,3 +201,32 @@
              :class :person,
              :confidence nil,
              :start-pos 3}]))
+
+(fact "expand-one-phrase-map"
+      (expand-one-phrase-map (tokenize (process-grammar (:grammar grammar)) "Dog cart wompus hutne")
+                             {:words ["hutne"],
+                              :end-pos 3,
+                              :original "hutne",
+                              :phrase-index 0,
+                              :parent-confidence nil,
+                              :phrase "hunter",
+                              :class :person,
+                              :confidence nil,
+                              :start-pos 3}
+                             :left) 
+      
+      => {:words ["wompus" "hutne"],
+          :end-pos 3,
+          :original "hutne",
+          :phrase-index 0,
+          :parent-confidence nil,
+          :phrase "hunter",
+          :class :person,
+          :confidence nil,
+          :start-pos 2})
+
+#_(fact "assemble-phrases"
+      (let [processed-grammar (process-grammar (:grammar grammar))]
+        (assemble-phrases processed-grammar
+                          (tokenize processed-grammar "Dog cart wompus hutne")))
+      => 1)

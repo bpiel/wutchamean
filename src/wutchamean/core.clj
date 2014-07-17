@@ -1,5 +1,5 @@
 (ns wutchamean.core
-  (:require [clojure.string :refer [split lower-case]]
+  (:require [clojure.string :refer [split lower-case join]]
             [incanter.stats :refer :all]))
 
 
@@ -67,3 +67,66 @@
                                    (:matches word-match)))
                             (:matches token)))       
                      (seq tokens)))))
+
+(defn calculate-phrase-confidence
+  [phrase-map]
+  (let [phrase-count (:phrase phrase-map)]
+    (double (/ (- (count phrase-count) 
+                  (damerau-levenshtein-distance (lower-case phrase-count)
+                                                (lower-case (join " " (:words phrase-map))))
+                  (count phrase-count))))))
+
+(defn expand-one-phrase-map
+  [tokens phrase-map direction]
+  (if (nil? phrase-map)
+    nil
+    (assoc 
+      (let [expander (fn [pm the-key key-fn]
+                       (if-let [new-word (:original (get tokens 
+                                                         (-> pm
+                                                             the-key
+                                                             key-fn)))]
+                         (-> phrase-map
+                             (update-in [the-key] key-fn)
+                             (update-in [:words] #(cons new-word %)))
+                         nil)
+                       )]
+        (cond         
+          (= direction :left)
+          (expander phrase-map :start-pos dec)
+          
+          (= direction :right)
+          (expander phrase-map :end-pos inc)
+          
+          (= direction :both)      
+          (-> phrase-map
+              (expander :start-pos dec)
+              (expander :end-pos inc))))
+      
+      :parent-confidence (:confidence phrase-map)
+      :confidence nil)))
+
+(defn expand-phrase-maps
+  [tokens phrase-maps]
+  (apply concat
+         (map (fn [phrase-map] 
+                (filter identity
+                        (map #(expand-one-phrase-map phrase-map tokens %)
+                             [:left :right :both])))
+                        phrase-maps)))
+
+(defn assemble-phrases-recur
+  [tokens phrase-maps]
+  (if-let [new-phrase-maps (->> phrase-maps
+                                (expand-phrase-maps tokens)
+                                (map #(update-in % :confidence (calculate-phrase-confidence %)))
+                                (filter #(< (:confidence %) (* 0.9 (:parent-confidence %)))))]
+    ;(recur tokens (concat phrase-maps new-phrase-maps))
+    [1]
+    phrase-maps))
+
+(defn assemble-phrases
+  [processed-grammar tokens]
+  (let [stub-phrase-maps (get-stub-phrases-from-tokens processed-grammar tokens)]
+    (filter #(< (:confidence %) 0.5) 
+            (assemble-phrases-recur stub-phrase-maps tokens))))
