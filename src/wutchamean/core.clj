@@ -71,8 +71,8 @@
   (let [phrase (:phrase phrase-map)]
     (double (/ (- (count phrase) 
                   (damerau-levenshtein-distance (lower-case phrase)
-                                                (lower-case (join " " (:words phrase-map))))
-                  (count phrase))))))
+                                                (lower-case (join " " (:words phrase-map)))))
+                  (count phrase)))))
 
 (defn expand-one-phrase-map
   [phrase-map tokens direction]
@@ -116,21 +116,32 @@
                         phrase-maps)))
 
 (defn assemble-phrases-recur
-  [tokens phrase-maps]
-  (if-let [new-phrase-maps (->> phrase-maps
+  [tokens phrase-maps iterations]
+  (if (< 0 iterations)
+    (if-let [new-phrase-maps (->> phrase-maps
                                 (expand-phrase-maps tokens)
                                 (map (fn [phrase-map] 
                                        (assoc phrase-map 
                                               :confidence (calculate-phrase-confidence phrase-map))))
-                                (filter #(or (-> % :parent-confidence nil?) (< (:confidence %) (* 0.9 (:parent-confidence %)))))
+                                (filter #(or (-> % :parent-confidence nil?) (> (:confidence %) (* 0.9 (:parent-confidence %)))))
                                 (filter #(< 0 (:confidence %))))]
-    (do 
-      (clojure.pprint/write new-phrase-maps)
-      (recur tokens (concat phrase-maps new-phrase-maps)))
+      (do 
+        (clojure.pprint/write new-phrase-maps)
+        (recur tokens (concat phrase-maps new-phrase-maps) (dec iterations)))
+      phrase-maps)
     phrase-maps))
+
 
 (defn assemble-phrases
   [processed-grammar tokens]
-  (let [stub-phrase-maps (get-stub-phrases-from-tokens processed-grammar tokens)]
-    (filter #(< (:confidence %) 0.5) 
-            (assemble-phrases-recur tokens stub-phrase-maps))))
+  (let [stub-phrase-maps (map (fn [phrase-map] 
+                                 (assoc phrase-map 
+                                              :confidence (calculate-phrase-confidence phrase-map)))
+                              (get-stub-phrases-from-tokens processed-grammar tokens))]
+    (println)
+    (println "stub-phrase-maps")
+    (println)			      
+    (clojure.pprint/write stub-phrase-maps)
+    (filter #(> (:confidence %) 0.5) 
+            (assemble-phrases-recur tokens stub-phrase-maps 0))))
+
