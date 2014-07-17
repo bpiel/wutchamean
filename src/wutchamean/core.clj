@@ -77,34 +77,34 @@
                   (count phrase-count))))))
 
 (defn expand-one-phrase-map
-  [tokens phrase-map direction]
+  [phrase-map tokens direction]
   (if (nil? phrase-map)
     nil
-    (assoc 
-      (let [expander (fn [pm the-key key-fn]
-                       (if-let [new-word (:original (get tokens 
-                                                         (-> pm
-                                                             the-key
-                                                             key-fn)))]
-                         (-> phrase-map
-                             (update-in [the-key] key-fn)
-                             (update-in [:words] #(cons new-word %)))
-                         nil)
-                       )]
-        (cond         
-          (= direction :left)
-          (expander phrase-map :start-pos dec)
-          
-          (= direction :right)
-          (expander phrase-map :end-pos inc)
-          
-          (= direction :both)      
-          (-> phrase-map
-              (expander :start-pos dec)
-              (expander :end-pos inc))))
-      
-      :parent-confidence (:confidence phrase-map)
-      :confidence nil)))
+    (if-let [new-phrase-map
+             (let [expander (fn [pm the-key key-fn]
+                              (if-let [new-word (:original (get tokens
+                                                                (-> pm the-key key-fn)))]
+                                (-> phrase-map
+                                    (update-in [the-key] key-fn)
+                                    (update-in [:words] #(if (= the-key :start-pos)
+                                                 (into [new-word] %)
+                                                 (into % [new-word]))))))]
+               (cond         
+                 (= direction :left)
+                 (expander phrase-map :start-pos dec)
+                 
+                 (= direction :right)
+                 (expander phrase-map :end-pos inc)
+                 
+                 (= direction :both)      
+                 (expand-one-phrase-map (expand-one-phrase-map phrase-map 
+                                                               tokens
+                                                               :left) 
+                                        tokens 
+                                        :right)))]
+      (assoc new-phrase-map        
+        :parent-confidence (:confidence phrase-map)
+        :confidence nil))))
 
 (defn expand-phrase-maps
   [tokens phrase-maps]

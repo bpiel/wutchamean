@@ -203,8 +203,7 @@
              :start-pos 3}]))
 
 (fact "expand-one-phrase-map"
-      (expand-one-phrase-map (tokenize (process-grammar (:grammar grammar)) "Dog cart wompus hutne")
-                             {:words ["hutne"],
+      (expand-one-phrase-map {:words ["hutne"],
                               :end-pos 3,
                               :original "hutne",
                               :phrase-index 0,
@@ -213,6 +212,7 @@
                               :class :person,
                               :confidence nil,
                               :start-pos 3}
+                             (tokenize (process-grammar (:grammar grammar)) "Dog cart wompus hutne")
                              :left) 
       
       => {:words ["wompus" "hutne"],
@@ -225,8 +225,125 @@
           :confidence nil,
           :start-pos 2})
 
+(fact "expand-phrase-maps"
+      (let [string "Dog cart wompus hutne"
+            processed-grammar (process-grammar (:grammar grammar))
+            tokens {0
+                    {:matches
+                     [{:confidence 1.0,
+                       :match "dog",
+                       :matches [{:class :animal, :index 0, :phrase "dog"}]}],
+                     :original "Dog",
+                     :position 0},
+                    1
+                    {:matches
+                     [{:confidence 1.0,
+                       :match "cat",
+                       :matches
+                       [{:class :person, :index 0, :phrase "Cat Woman"}
+                        {:class :animal, :index 0, :phrase "cat"}
+                        {:class :animal,
+                         :index 1,
+                         :phrase "Austrian Cat Southern-style"}]}],
+                     :original "cat",
+                     :position 1},
+                    2
+                    {:matches
+                     [{:confidence 1.0,
+                       :match "wumpus",
+                       :matches [{:class :animal, :index 1, :phrase "hunted wumpus"}]}],
+                     :original "wumpus",
+                     :position 2},
+                    3
+                    {:matches
+                     [{:confidence 0.6666666666666667,
+                       :match "hunted",
+                       :matches [{:class :animal, :index 0, :phrase "hunted wumpus"}]}
+                      {:confidence 0.6666666666666667,
+                       :match "hunter",
+                       :matches [{:class :person, :index 0, :phrase "hunter"}]}],
+                     :original "hutne",
+                     :position 3}}
+            stub-phrases [{:words ["Dog"],
+                           :end-pos 0,
+                           :original "Dog",
+                           :phrase-index 0,
+                           :parent-confidence nil,
+                           :phrase "dog",
+                           :class :animal,
+                           :confidence nil,
+                           :start-pos 0}                          
+                          {:words ["cart"],
+                           :end-pos 1,
+                           :original "cart",
+                           :phrase-index 1,
+                           :parent-confidence nil,
+                           :phrase "Austrian Cat Southern-style",
+                           :class :animal,
+                           :confidence 0.6,
+                           :start-pos 1}                          
+                          {:words ["hutne"],
+                           :end-pos 3,
+                           :original "hutne",
+                           :phrase-index 0,
+                           :parent-confidence nil,
+                           :phrase "hunter",
+                           :class :person,
+                           :confidence 0.3,
+                           :start-pos 3}]]
+        
+        (expand-phrase-maps tokens
+                            stub-phrases))
+      => [{:words ["Dog" "cat"],
+           :end-pos 1,
+           :original "Dog",
+           :phrase-index 0,
+           :parent-confidence nil,
+           :phrase "dog",
+           :class :animal,
+           :confidence nil,
+           :start-pos 0}
+          {:words ["Dog" "cart"],
+           :end-pos 1,
+           :original "cart",
+           :phrase-index 1,
+           :parent-confidence 0.6,
+           :phrase "Austrian Cat Southern-style",
+           :class :animal,
+           :confidence nil,
+           :start-pos 0}
+          {:words ["cart" "wumpus"],
+           :end-pos 2,
+           :original "cart",
+           :phrase-index 1,
+           :parent-confidence 0.6,
+           :phrase "Austrian Cat Southern-style",
+           :class :animal,
+           :confidence nil,
+           :start-pos 1}
+          {:words ["Dog" "cart" "wumpus"],
+           :end-pos 2,
+           :original "cart",
+           :phrase-index 1,
+           :parent-confidence 0.6,
+           :phrase "Austrian Cat Southern-style",
+           :class :animal,
+           :confidence nil,
+           :start-pos 0}
+          {:words ["wumpus" "hutne"],
+           :end-pos 3,
+           :original "hutne",
+           :phrase-index 0,
+           :parent-confidence 0.3,
+           :phrase "hunter",
+           :class :person,
+           :confidence nil,
+           :start-pos 2}]
+      )
+
+
 #_(fact "assemble-phrases"
-      (let [processed-grammar (process-grammar (:grammar grammar))]
-        (assemble-phrases processed-grammar
-                          (tokenize processed-grammar "Dog cart wompus hutne")))
-      => 1)
+        (let [processed-grammar (process-grammar (:grammar grammar))]
+          (assemble-phrases processed-grammar
+                            (tokenize processed-grammar "Dog cart wompus hutne")))
+        => 1)
