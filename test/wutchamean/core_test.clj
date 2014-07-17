@@ -141,7 +141,6 @@
         => [{:words ["Dog"],
              :end-pos 0,
              :original "Dog",
-             :phrase-index 0,
              :parent-confidence nil,
              :phrase "dog",
              :class :animal,
@@ -150,7 +149,6 @@
             {:words ["cart"],
              :end-pos 1,
              :original "cart",
-             :phrase-index 0,
              :parent-confidence nil,
              :phrase "Cat Woman",
              :class :person,
@@ -159,7 +157,6 @@
             {:words ["cart"],
              :end-pos 1,
              :original "cart",
-             :phrase-index 0,
              :parent-confidence nil,
              :phrase "cat",
              :class :animal,
@@ -168,7 +165,6 @@
             {:words ["cart"],
              :end-pos 1,
              :original "cart",
-             :phrase-index 1,
              :parent-confidence nil,
              :phrase "Austrian Cat Southern-style",
              :class :animal,
@@ -177,7 +173,6 @@
             {:words ["wompus"],
              :end-pos 2,
              :original "wompus",
-             :phrase-index 1,
              :parent-confidence nil,
              :phrase "hunted wumpus",
              :class :animal,
@@ -186,7 +181,6 @@
             {:words ["hutne"],
              :end-pos 3,
              :original "hutne",
-             :phrase-index 0,
              :parent-confidence nil,
              :phrase "hunted wumpus",
              :class :animal,
@@ -195,7 +189,6 @@
             {:words ["hutne"],
              :end-pos 3,
              :original "hutne",
-             :phrase-index 0,
              :parent-confidence nil,
              :phrase "hunter",
              :class :person,
@@ -217,7 +210,7 @@
       
       => {:words ["wompus" "hutne"],
           :end-pos 3,
-          :original "hutne",
+          :original "wompus hutne",
           :phrase-index 0,
           :parent-confidence nil,
           :phrase "hunter",
@@ -267,7 +260,6 @@
             stub-phrases [{:words ["Dog"],
                            :end-pos 0,
                            :original "Dog",
-                           :phrase-index 0,
                            :parent-confidence nil,
                            :phrase "dog",
                            :class :animal,
@@ -276,7 +268,6 @@
                           {:words ["cart"],
                            :end-pos 1,
                            :original "cart",
-                           :phrase-index 1,
                            :parent-confidence nil,
                            :phrase "Austrian Cat Southern-style",
                            :class :animal,
@@ -285,7 +276,6 @@
                           {:words ["hutne"],
                            :end-pos 3,
                            :original "hutne",
-                           :phrase-index 0,
                            :parent-confidence nil,
                            :phrase "hunter",
                            :class :person,
@@ -296,8 +286,7 @@
                             stub-phrases))
       => [{:words ["Dog" "cat"],
            :end-pos 1,
-           :original "Dog",
-           :phrase-index 0,
+           :original "Dog cat",
            :parent-confidence nil,
            :phrase "dog",
            :class :animal,
@@ -305,8 +294,7 @@
            :start-pos 0}
           {:words ["Dog" "cart"],
            :end-pos 1,
-           :original "cart",
-           :phrase-index 1,
+           :original "Dog cart",
            :parent-confidence 0.6,
            :phrase "Austrian Cat Southern-style",
            :class :animal,
@@ -314,8 +302,7 @@
            :start-pos 0}
           {:words ["cart" "wumpus"],
            :end-pos 2,
-           :original "cart",
-           :phrase-index 1,
+           :original "cart wumpus",
            :parent-confidence 0.6,
            :phrase "Austrian Cat Southern-style",
            :class :animal,
@@ -323,8 +310,7 @@
            :start-pos 1}
           {:words ["Dog" "cart" "wumpus"],
            :end-pos 2,
-           :original "cart",
-           :phrase-index 1,
+           :original "Dog cart wumpus",
            :parent-confidence 0.6,
            :phrase "Austrian Cat Southern-style",
            :class :animal,
@@ -332,8 +318,7 @@
            :start-pos 0}
           {:words ["wumpus" "hutne"],
            :end-pos 3,
-           :original "hutne",
-           :phrase-index 0,
+           :original "wumpus hutne",
            :parent-confidence 0.3,
            :phrase "hunter",
            :class :person,
@@ -343,7 +328,49 @@
 
 
 (fact "assemble-phrases"
-        (let [processed-grammar (process-grammar (:grammar grammar))]
-          (assemble-phrases processed-grammar
-                            (tokenize processed-grammar "Dog cart wompus hutne")))
-        => 1)
+      (let [processed-grammar (process-grammar (:grammar grammar))]
+        (assemble-phrases processed-grammar
+                          (tokenize processed-grammar "Dog cart wompus hutne")))
+      => [{:class :animal,
+           :confidence 1.0,
+           :end-pos 0,
+           :original "Dog",
+           :phrase "dog",
+           :start-pos 0,
+           :words ["Dog"]}
+          {:class :animal,
+           :confidence 0.6666666666666667,
+           :end-pos 1,
+           :original "cart",
+           :phrase "cat",
+           :start-pos 1,
+           :words ["cart"]}
+          {:class :person,
+           :confidence 0.6666666666666667,
+           :end-pos 3,
+           :original "hutne",
+           :phrase "hunter",
+           :start-pos 3,
+           :words ["hutne"]}
+          {:class :person,
+           :confidence 0.5555555555555556,
+           :end-pos 2,
+           :original "cart wompus",
+           :phrase "Cat Woman",
+           :start-pos 1,
+           :words ["cart" "wompus"]}
+          {:class :animal,
+           :confidence 0.5384615384615385,
+           :end-pos 2,
+           :original "cart wompus",
+           :phrase "hunted wumpus",
+           :start-pos 1,
+           :words ["cart" "wompus"]}
+          {:class :animal,
+           :confidence 0.6923076923076923,
+           :end-pos 3,
+           :original "wompus hutne",
+           :phrase "hunted wumpus",
+           :start-pos 2,
+           :words ["wompus" "hutne"]}] )
+

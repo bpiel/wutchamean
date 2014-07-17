@@ -56,7 +56,6 @@
                                      (hash-map :phrase (:phrase phrase-match)
                                                :start-pos (:position token)
                                                :end-pos (:position token)
-                                               :phrase-index (:index phrase-match)
                                                :confidence nil
                                                :parent-confidence nil
                                                :class (:class phrase-match)
@@ -66,13 +65,22 @@
                             (:matches token)))       
                      (seq tokens)))))
 
+(defn sort-words [phrase]
+  (join " " (sort (split phrase #"[^\w\d']+"))))
+
+(defn calculate-distance [string1 string2]
+  (double (/ (- (count string1) 
+                (damerau-levenshtein-distance (lower-case string1)
+                                              (lower-case string2)))
+             (count string1))))
+
 (defn calculate-phrase-confidence
   [phrase-map]
-  (let [phrase (:phrase phrase-map)]
-    (double (/ (- (count phrase) 
-                  (damerau-levenshtein-distance (lower-case phrase)
-                                                (lower-case (join " " (:words phrase-map)))))
-                  (count phrase)))))
+  (let [phrase (:phrase phrase-map)
+        words (join " " (:words phrase-map))]
+     (max (calculate-distance phrase words)
+          (* 0.9 (calculate-distance (sort-words phrase)
+                                     (sort-words words))))))
 
 (defn expand-one-phrase-map
   [phrase-map tokens direction]
@@ -117,21 +125,21 @@
                         phrase-maps)))
 
 (defn assemble-phrases-recur
-  [tokens phrase-maps iterations]
-  (if (< 0 iterations)
-    (if-let [new-phrase-maps (->> phrase-maps
-                                (expand-phrase-maps tokens)
-                                (map (fn [phrase-map] 
-                                       (assoc phrase-map 
-                                              :confidence (calculate-phrase-confidence phrase-map))))
-                                (filter #(or (-> % :parent-confidence nil?) (> (:confidence %) (* 0.9 (:parent-confidence %)))))
-                                (filter #(< 0 (:confidence %))))]
-      (do 
-        (println)
-	(println "assemble-phrases-recur -- before recur")
-	(println)
-        (clojure.pprint/write new-phrase-maps)
-        (recur tokens (concat phrase-maps new-phrase-maps) (dec iterations)))
+  [tokens phrase-maps last-batch iterations]
+  (if (and (< 0 iterations)
+           (< 0 (count last-batch)))
+    (if-let [new-phrase-maps (->> last-batch
+                                  (expand-phrase-maps tokens)
+                                  (map (fn [phrase-map] 
+                                         (assoc phrase-map 
+                                           :confidence (calculate-phrase-confidence phrase-map))))
+                                  (filter #(or (-> % :parent-confidence nil?) (> (:confidence %) (* 0.9 (:parent-confidence %)))))
+                                  (filter #(< 0 (:confidence %))))]
+        (recur tokens 
+               (distinct (map #(dissoc % :parent-confidence)
+                              (concat phrase-maps new-phrase-maps))) 
+               new-phrase-maps 
+               (dec iterations))
       phrase-maps)
     phrase-maps))
 
@@ -142,10 +150,6 @@
                                  (assoc phrase-map 
                                               :confidence (calculate-phrase-confidence phrase-map)))
                               (get-stub-phrases-from-tokens processed-grammar tokens))]
-    (println)
-    (println "stub-phrase-maps")
-    (println)			      
-    (clojure.pprint/write stub-phrase-maps)
     (filter #(> (:confidence %) 0.5) 
-            (assemble-phrases-recur tokens stub-phrase-maps 1))))
+            (assemble-phrases-recur tokens stub-phrase-maps stub-phrase-maps 10))))
 
