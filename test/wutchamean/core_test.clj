@@ -406,21 +406,23 @@
 
 
 (fact "pick-most-confident-phrases -- conflict"
-      (pick-most-confident-phrases [{ :start-pos 1 :end-pos 2}
-                                    { :start-pos 1 :end-pos 4}
-                                    { :start-pos 5 :end-pos 6}
-                                    { :start-pos 4 :end-pos 5}]
+      (pick-most-confident-phrases [{ :start-pos 1 :end-pos 2 :confidence 1}
+                                    { :start-pos 1 :end-pos 4 :confidence 1}
+                                    { :start-pos 5 :end-pos 6 :confidence 1}
+                                    { :start-pos 4 :end-pos 5 :confidence 1}]
                                    []
-                                   nil)
-      => [[{:end-pos 6, :start-pos 5} {:end-pos 2, :start-pos 1}]
-          {:end-pos 4, :start-pos 1}])
+                                   nil
+                                   2)
+      => [[{:end-pos 6, :start-pos 5 :confidence 1} {:end-pos 2, :start-pos 1 :confidence 1}]
+          {:end-pos 4, :start-pos 1 :confidence 1}])
 
-(fact "pick-most-confident-phrases -- has conflict"
-      (pick-most-confident-phrases [{ :start-pos 1 :end-pos 2}
-                                    { :start-pos 10 :end-pos 12}
-                                    { :start-pos 5 :end-pos 6}]
+(fact "pick-most-confident-phrases -- no conflict"
+      (pick-most-confident-phrases [{ :start-pos 1 :end-pos 2 :confidence 1}
+                                    { :start-pos 10 :end-pos 12 :confidence 1}
+                                    { :start-pos 5 :end-pos 6 :confidence 1}]
                                    []
-                                   nil)
-      => [[{:end-pos 6, :start-pos 5} {:end-pos 12, :start-pos 10} {:end-pos 2, :start-pos 1}]
+                                   nil
+                                   2)
+      => [[{:end-pos 6, :start-pos 5 :confidence 1} {:end-pos 12, :start-pos 10 :confidence 1} {:end-pos 2, :start-pos 1 :confidence 1}]
           nil])
 

@@ -78,9 +78,9 @@
   [phrase-map]
   (let [phrase (:phrase phrase-map)
         words (join " " (:words phrase-map))]
-     (max (calculate-distance phrase words)
-          (* 0.9 (calculate-distance (sort-words phrase)
-                                     (sort-words words))))))
+    (max (calculate-distance phrase words)
+         (* 0.9 (calculate-distance (sort-words phrase)
+                                    (sort-words words))))))
 
 (defn expand-one-phrase-map
   [phrase-map tokens direction]
@@ -94,8 +94,8 @@
                                 (-> phrase-map
                                     (update-in [the-key] key-fn)
                                     (update-in [:words] #(if (= the-key :start-pos)
-                                                 (into [new-word] %)
-                                                 (into % [new-word]))))))]
+                                                           (into [new-word] %)
+                                                           (into % [new-word]))))))]
                (cond         
                  (= direction :left)
                  (expander phrase-map :start-pos dec)
@@ -112,7 +112,7 @@
       (assoc new-phrase-map        
         :parent-confidence (:confidence phrase-map)
         :confidence nil
-	:original (join " " (:words new-phrase-map))))))
+        :original (join " " (:words new-phrase-map))))))
 
 (defn expand-phrase-maps
   [tokens phrase-maps]
@@ -122,7 +122,7 @@
                 (filter identity
                         (map #(expand-one-phrase-map phrase-map tokens %)
                              [:left :right :both])))
-                        phrase-maps)))
+              phrase-maps)))
 
 (defn assemble-phrases-recur
   [tokens phrase-maps last-batch iterations]
@@ -135,11 +135,11 @@
                                            :confidence (calculate-phrase-confidence phrase-map))))
                                   (filter #(or (-> % :parent-confidence nil?) (> (:confidence %) (* 0.9 (:parent-confidence %)))))
                                   (filter #(< 0 (:confidence %))))]
-        (recur tokens 
-               (distinct (map #(dissoc % :parent-confidence)
-                              (concat phrase-maps new-phrase-maps))) 
-               new-phrase-maps 
-               (dec iterations))
+      (recur tokens 
+             (distinct (map #(dissoc % :parent-confidence)
+                            (concat phrase-maps new-phrase-maps))) 
+             new-phrase-maps 
+             (dec iterations))
       phrase-maps)
     phrase-maps))
 
@@ -147,8 +147,8 @@
 (defn assemble-phrases
   [processed-grammar tokens]
   (let [stub-phrase-maps (map (fn [phrase-map] 
-                                 (assoc phrase-map 
-                                              :confidence (calculate-phrase-confidence phrase-map)))
+                                (assoc phrase-map 
+                                  :confidence (calculate-phrase-confidence phrase-map)))
                               (get-stub-phrases-from-tokens processed-grammar tokens))]
     (filter #(> (:confidence %) 0.5) 
             (assemble-phrases-recur tokens stub-phrase-maps stub-phrase-maps 10))))
@@ -162,22 +162,38 @@
         true
         (recur check-phrase (rest phrase-seq))))))
 
-(defn pick-most-confident-phrases [remaining-phrases chosen-phrases first-skip]
+(defn pick-most-confident-phrases [remaining-phrases chosen-phrases first-skip max-skip-confidence]
   (if (empty? remaining-phrases)
     [chosen-phrases first-skip]
     (let [first-phrase (first remaining-phrases)
           conflict (has-conflict first-phrase chosen-phrases)]
-        (if (not conflict)
-          (recur (rest remaining-phrases) (cons first-phrase chosen-phrases) first-skip)
-          (recur (rest remaining-phrases) chosen-phrases (or first-skip first-phrase))))))
+      (if (not conflict)
+        (recur (rest remaining-phrases) 
+               (cons first-phrase chosen-phrases) 
+               first-skip
+               max-skip-confidence)
+        (recur (rest remaining-phrases) 
+               chosen-phrases 
+               (if (and (nil? first-skip) 
+                        (> max-skip-confidence 
+                           (:confidence first-phrase)))
+                 first-phrase
+                 first-skip)
+               max-skip-confidence)))))
 
-#_(defn get-phrase-sequences [sorted-phrases phrase-seqs first-skip iterations]
+(defn get-phrase-sequences [sorted-phrases phrase-seqs first-skip iterations]
   (if (<= 0 iterations)
-      (let [[new-chosen new-first-skip] (pick-most-confident-phrases sorted-phrases [first-skip] first-skip)]
-           (if new-first-skip
-             (recur sorted-phrases (concat))))))
+    (let [[new-chosen new-first-skip] (pick-most-confident-phrases sorted-phrases 
+                                                                   [first-skip] 
+                                                                   nil 
+                                                                   (or (:confidence first-skip) 2))]
+      (if new-first-skip
+        (recur sorted-phrases 
+               (concat phrase-seqs new-chosen)
+               new-first-skip
+               (dec iterations))))))
 
 (defn guess-phrase-sequences-from-assembled [processed-grammar assembled-phrases]
-   
+  
   
   )
