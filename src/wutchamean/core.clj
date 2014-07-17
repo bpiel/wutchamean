@@ -60,6 +60,7 @@
                                                :end-pos (:position token)
                                                :phrase-index (:index phrase-match)
                                                :confidence nil
+                                               :parent-confidence nil
                                                :class (:class phrase-match)
                                                :original (:original token)
                                                :words [(:original token)]))

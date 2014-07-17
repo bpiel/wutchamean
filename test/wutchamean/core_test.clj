@@ -137,60 +137,67 @@
 (fact "get stub phrases from tokens"
       (let [processed-grammar (process-grammar (:grammar grammar))]
         (get-stub-phrases-from-tokens processed-grammar
-                          (tokenize processed-grammar "Dog cart wompus hutne"))
-        => [{:class :animal,
-             :confidence nil,
+                                      (tokenize processed-grammar "Dog cart wompus hutne"))
+        => [{:words ["Dog"],
              :end-pos 0,
              :original "Dog",
+             :phrase-index 0,
+             :parent-confidence nil,
              :phrase "dog",
-             :phrase-index 0,
-             :start-pos 0,
-             :words ["Dog"]}
-            {:class :person,
+             :class :animal,
              :confidence nil,
+             :start-pos 0}
+            {:words ["cart"],
              :end-pos 1,
              :original "cart",
+             :phrase-index 0,
+             :parent-confidence nil,
              :phrase "Cat Woman",
-             :phrase-index 0,
-             :start-pos 1,
-             :words ["cart"]}
-            {:class :animal,
+             :class :person,
              :confidence nil,
+             :start-pos 1}
+            {:words ["cart"],
              :end-pos 1,
              :original "cart",
+             :phrase-index 0,
+             :parent-confidence nil,
              :phrase "cat",
-             :phrase-index 0,
-             :start-pos 1,
-             :words ["cart"]}
-            {:class :animal,
+             :class :animal,
              :confidence nil,
+             :start-pos 1}
+            {:words ["cart"],
              :end-pos 1,
              :original "cart",
-             :phrase "Austrian Cat Southern-style",
              :phrase-index 1,
-             :start-pos 1,
-             :words ["cart"]}
-            {:class :animal,
+             :parent-confidence nil,
+             :phrase "Austrian Cat Southern-style",
+             :class :animal,
              :confidence nil,
+             :start-pos 1}
+            {:words ["wompus"],
              :end-pos 2,
              :original "wompus",
-             :phrase "hunted wumpus",
              :phrase-index 1,
-             :start-pos 2,
-             :words ["wompus"]}
-            {:class :animal,
-             :confidence nil,
-             :end-pos 3,
-             :original "hutne",
+             :parent-confidence nil,
              :phrase "hunted wumpus",
-             :phrase-index 0,
-             :start-pos 3,
-             :words ["hutne"]}
-            {:class :person,
+             :class :animal,
              :confidence nil,
+             :start-pos 2}
+            {:words ["hutne"],
              :end-pos 3,
              :original "hutne",
-             :phrase "hunter",
              :phrase-index 0,
-             :start-pos 3,
-             :words ["hutne"]}]))
+             :parent-confidence nil,
+             :phrase "hunted wumpus",
+             :class :animal,
+             :confidence nil,
+             :start-pos 3}
+            {:words ["hutne"],
+             :end-pos 3,
+             :original "hutne",
+             :phrase-index 0,
+             :parent-confidence nil,
+             :phrase "hunter",
+             :class :person,
+             :confidence nil,
+             :start-pos 3}]))
