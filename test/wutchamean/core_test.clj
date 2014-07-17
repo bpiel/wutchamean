@@ -342,7 +342,7 @@
       )
 
 
-#_(fact "assemble-phrases"
+(fact "assemble-phrases"
         (let [processed-grammar (process-grammar (:grammar grammar))]
           (assemble-phrases processed-grammar
                             (tokenize processed-grammar "Dog cart wompus hutne")))

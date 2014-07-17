@@ -70,11 +70,11 @@
 
 (defn calculate-phrase-confidence
   [phrase-map]
-  (let [phrase-count (:phrase phrase-map)]
-    (double (/ (- (count phrase-count) 
-                  (damerau-levenshtein-distance (lower-case phrase-count)
+  (let [phrase (:phrase phrase-map)]
+    (double (/ (- (count phrase) 
+                  (damerau-levenshtein-distance (lower-case phrase)
                                                 (lower-case (join " " (:words phrase-map))))
-                  (count phrase-count))))))
+                  (count phrase))))))
 
 (defn expand-one-phrase-map
   [phrase-map tokens direction]
@@ -82,6 +82,7 @@
     nil
     (if-let [new-phrase-map
              (let [expander (fn [pm the-key key-fn]
+                              
                               (if-let [new-word (:original (get tokens
                                                                 (-> pm the-key key-fn)))]
                                 (-> phrase-map
@@ -108,6 +109,7 @@
 
 (defn expand-phrase-maps
   [tokens phrase-maps]
+  
   (apply concat
          (map (fn [phrase-map] 
                 (filter identity
@@ -119,14 +121,18 @@
   [tokens phrase-maps]
   (if-let [new-phrase-maps (->> phrase-maps
                                 (expand-phrase-maps tokens)
-                                (map #(update-in % :confidence (calculate-phrase-confidence %)))
-                                (filter #(< (:confidence %) (* 0.9 (:parent-confidence %)))))]
-    ;(recur tokens (concat phrase-maps new-phrase-maps))
-    [1]
+                                (map (fn [phrase-map] 
+                                       (assoc phrase-map 
+                                              :confidence (calculate-phrase-confidence phrase-map))))
+                                (filter #(or (-> % :parent-confidence nil?) (< (:confidence %) (* 0.9 (:parent-confidence %)))))
+                                (filter #(< 0 (:confidence %))))]
+    (do 
+      (clojure.pprint/write new-phrase-maps)
+      (recur tokens (concat phrase-maps new-phrase-maps)))
     phrase-maps))
 
 (defn assemble-phrases
   [processed-grammar tokens]
   (let [stub-phrase-maps (get-stub-phrases-from-tokens processed-grammar tokens)]
     (filter #(< (:confidence %) 0.5) 
-            (assemble-phrases-recur stub-phrase-maps tokens))))
+            (assemble-phrases-recur tokens stub-phrase-maps))))
