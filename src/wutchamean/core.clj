@@ -59,7 +59,7 @@
                                                :start-pos (:position token)
                                                :end-pos (:position token)
                                                :phrase-index (:index phrase-match)
-                                               :confidence (:confidence word-match)
+                                               :confidence nil
                                                :class (:class phrase-match)
                                                :original (:original token)
                                                :words [(:original token)]))

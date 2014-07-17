@@ -134,12 +134,12 @@
            :original "hutne",
            :position 3}})
 
-(fact "assemble phrases"
+(fact "get stub phrases from tokens"
       (let [processed-grammar (process-grammar (:grammar grammar))]
-        (assemble-phrases processed-grammar
+        (get-stub-phrases-from-tokens processed-grammar
                           (tokenize processed-grammar "Dog cart wompus hutne"))
         => [{:class :animal,
-             :confidence 1.0,
+             :confidence nil,
              :end-pos 0,
              :original "Dog",
              :phrase "dog",
@@ -147,7 +147,7 @@
              :start-pos 0,
              :words ["Dog"]}
             {:class :person,
-             :confidence 0.6666666666666667,
+             :confidence nil,
              :end-pos 1,
              :original "cart",
              :phrase "Cat Woman",
@@ -155,7 +155,7 @@
              :start-pos 1,
              :words ["cart"]}
             {:class :animal,
-             :confidence 0.6666666666666667,
+             :confidence nil,
              :end-pos 1,
              :original "cart",
              :phrase "cat",
@@ -163,7 +163,7 @@
              :start-pos 1,
              :words ["cart"]}
             {:class :animal,
-             :confidence 0.6666666666666667,
+             :confidence nil,
              :end-pos 1,
              :original "cart",
              :phrase "Austrian Cat Southern-style",
@@ -171,7 +171,7 @@
              :start-pos 1,
              :words ["cart"]}
             {:class :animal,
-             :confidence 0.8333333333333333,
+             :confidence nil,
              :end-pos 2,
              :original "wompus",
              :phrase "hunted wumpus",
@@ -179,7 +179,7 @@
              :start-pos 2,
              :words ["wompus"]}
             {:class :animal,
-             :confidence 0.6666666666666667,
+             :confidence nil,
              :end-pos 3,
              :original "hutne",
              :phrase "hunted wumpus",
@@ -187,7 +187,7 @@
              :start-pos 3,
              :words ["hutne"]}
             {:class :person,
-             :confidence 0.6666666666666667,
+             :confidence nil,
              :end-pos 3,
              :original "hutne",
              :phrase "hunter",
