@@ -181,7 +181,7 @@
                  first-skip)
                max-skip-confidence)))))
 
-(defn get-phrase-sequences
+(defn get-phrase-sequences-recursive
   [sorted-phrases phrase-seqs first-skip iterations]
   (if (<= 0 iterations)
     (let [[new-chosen new-first-skip] (pick-most-confident-phrases sorted-phrases 
@@ -195,6 +195,11 @@
                (dec iterations))
         phrase-seqs))
     phrase-seqs))
+
+
+(defn get-phrase-sequences
+  [sorted-phrases]
+  (get-phrase-sequences-recursive sorted-phrases [] nil 1))
 
 (defn calculate-phrase-seq-confidence 
   [phrase-seq]  
@@ -227,7 +232,7 @@
   (let [processed-grammar (process-grammar (:grammar grammar))]
   (map #(-> % :phrase-seq phrase-seq-to-guessed-string)
          (order-by-confidence-phrase-sequences-from-assembled 
-           (get-phrase-sequences
+           (get-phrase-sequences-recursive
              (sort #(> (:confidence %) (:confidence %2))
            (assemble-phrases processed-grammar
                              (tokenize processed-grammar

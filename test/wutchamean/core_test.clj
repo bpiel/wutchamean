@@ -466,7 +466,7 @@
       => [[{:end-pos 6, :start-pos 5 :confidence 1} {:end-pos 12, :start-pos 10 :confidence 1} {:end-pos 2, :start-pos 1 :confidence 1}]
           nil])
 
-(fact "get-phrase-sequences"
+(fact "get-phrase-sequences-recursive"
       (let [sorted-phrases [{:class :animal,
                              :confidence 0.6923076923076923,
                              :end-pos 3,
@@ -511,7 +511,7 @@
                              :words ["cart" "wompus"]}
                             ]
             ]
-        (get-phrase-sequences sorted-phrases [] nil 0))
+        (get-phrase-sequences-recursive sorted-phrases [] nil 0))
       => [[{:class :animal,
            :confidence 0.6666666666666667,
            :end-pos 1,
