@@ -199,7 +199,7 @@
 
 (defn get-phrase-sequences
   [sorted-phrases]
-  (get-phrase-sequences-recursive sorted-phrases [] nil 1))
+  (get-phrase-sequences-recursive sorted-phrases [] nil 10))
 
 (defn calculate-phrase-seq-confidence 
   [phrase-seq]  
