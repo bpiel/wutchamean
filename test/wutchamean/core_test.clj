@@ -25,6 +25,46 @@
           ["southern" {:index 2, :phrase "Austrian Cat Southern-style"}]
           ["style" {:index 3, :phrase "Austrian Cat Southern-style"}]])
 
+(fact "strings get split -- tricky words"
+      (split-words-in-phrase-list ["(Email Summary) - % change 1st time orders previous 7 days"]) 
+      => [["email"
+           {:index 0,
+            :phrase
+            "(Email Summary) - % change 1st time orders previous 7 days"}]
+          ["summary"
+           {:index 1,
+            :phrase
+            "(Email Summary) - % change 1st time orders previous 7 days"}]
+          ["change"
+           {:index 2,
+            :phrase
+            "(Email Summary) - % change 1st time orders previous 7 days"}]
+          ["1st"
+           {:index 3,
+            :phrase
+            "(Email Summary) - % change 1st time orders previous 7 days"}]
+          ["time"
+           {:index 4,
+            :phrase
+            "(Email Summary) - % change 1st time orders previous 7 days"}]
+          ["orders"
+           {:index 5,
+            :phrase
+            "(Email Summary) - % change 1st time orders previous 7 days"}]
+          ["previous"
+           {:index 6,
+            :phrase
+            "(Email Summary) - % change 1st time orders previous 7 days"}]
+          ["7"
+           {:index 7,
+            :phrase
+            "(Email Summary) - % change 1st time orders previous 7 days"}]
+          ["days"
+           {:index 8,
+            :phrase
+            "(Email Summary) - % change 1st time orders previous 7 days"}]])
+
+
 (fact "process-grammar"
       (process-grammar (:grammar grammar))
       => {"australia" [["australia"

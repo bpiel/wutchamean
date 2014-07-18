@@ -10,7 +10,7 @@
                 (map-indexed (fn [idx word] 
                                [(lower-case word) {:phrase (second tuple) :index idx}])
                              (first tuple)))
-              (map #(vector (split % #"[^\w\d']+") %)
+              (map #(vector (filter not-empty (split % #"[^\w\d']+")) %)
                    phrase-list))))
 
 (defn process-grammar
