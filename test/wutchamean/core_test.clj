@@ -745,4 +745,4 @@
 
 (fact "string-to-guessed-string"
       (string-to-guessed-string grammar "Dog cart wompus hutne")
-      => ["dog cat hunted wumpus"])
+      => ["dog cat hunted wumpus" "dog Cat Woman hunter" "dog cat hunter"])

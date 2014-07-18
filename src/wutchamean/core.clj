@@ -232,14 +232,14 @@
   (let [processed-grammar (process-grammar (:grammar grammar))]
   (map #(-> % :phrase-seq phrase-seq-to-guessed-string)
          (order-by-confidence-phrase-sequences-from-assembled 
-           (get-phrase-sequences-recursive
+           (get-phrase-sequences
              (sort #(> (:confidence %) (:confidence %2))
            (assemble-phrases processed-grammar
                              (tokenize processed-grammar
                                       string)
                              )
            )
-             [] nil 0
+             
            )
          )
     )
