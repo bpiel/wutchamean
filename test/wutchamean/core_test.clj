@@ -745,5 +745,79 @@
 
 (fact "string-to-guessed-string"
       (let [processed-grammar (process-grammar (:grammar grammar))]
-           (string-to-guessed-string processed-grammar  "Dog cart wompus hutne"))
+        (string-to-guessed-string processed-grammar  "Dog cart wompus hutne"))
       => ["dog cat hunted wumpus" "dog Cat Woman hunter" "dog cat hunter"])
+
+(fact "string-to-guessed-phrase-sequences"
+      (let [processed-grammar (process-grammar (:grammar grammar))]
+        (string-to-guessed-phrase-sequences processed-grammar  "Dog cart wompus hutne"))
+      => [{:confidence 0.6567567567567567,
+           :phrase-seq
+           [{:class :animal,
+             :confidence 1.0,
+             :end-pos 0,
+             :original "Dog",
+             :phrase "dog",
+             :start-pos 0,
+             :words ["Dog"]}
+            {:class :animal,
+             :confidence 0.6666666666666667,
+             :end-pos 1,
+             :original "cart",
+             :phrase "cat",
+             :start-pos 1,
+             :words ["cart"]}
+            {:class :animal,
+             :confidence 0.6923076923076923,
+             :end-pos 3,
+             :original "wompus hutne",
+             :phrase "hunted wumpus",
+             :start-pos 2,
+             :words ["wompus" "hutne"]}]}
+          {:confidence 0.7567567567567568,
+           :phrase-seq
+           [{:class :animal,
+             :confidence 1.0,
+             :end-pos 0,
+             :original "Dog",
+             :phrase "dog",
+             :start-pos 0,
+             :words ["Dog"]}
+            {:class :person,
+             :confidence 0.5555555555555556,
+             :end-pos 2,
+             :original "cart wompus",
+             :phrase "Cat Woman",
+             :start-pos 1,
+             :words ["cart" "wompus"]}
+            {:class :person,
+             :confidence 0.6666666666666667,
+             :end-pos 3,
+             :original "hutne",
+             :phrase "hunter",
+             :start-pos 3,
+             :words ["hutne"]}]}
+          {:confidence 0.782608695652174,
+           :phrase-seq
+           [{:class :animal,
+             :confidence 1.0,
+             :end-pos 0,
+             :original "Dog",
+             :phrase "dog",
+             :start-pos 0,
+             :words ["Dog"]}
+            {:class :animal,
+             :confidence 0.6666666666666667,
+             :end-pos 1,
+             :original "cart",
+             :phrase "cat",
+             :start-pos 1,
+             :words ["cart"]}
+            {:class :person,
+             :confidence 0.6666666666666667,
+             :end-pos 3,
+             :original "hutne",
+             :phrase "hunter",
+             :start-pos 3,
+             :words ["hutne"]}]}]
+      )

@@ -227,19 +227,16 @@
     [phrase-seq]
     (join " " (map :phrase phrase-seq)))
 
-(defn string-to-guessed-string
+(defn string-to-guessed-phrase-sequences
   [processed-grammar string]  
-  (map #(-> % :phrase-seq phrase-seq-to-guessed-string)
          (order-by-confidence-phrase-sequences-from-assembled 
            (get-phrase-sequences
              (sort #(> (:confidence %) (:confidence %2))
            (assemble-phrases processed-grammar
                              (tokenize processed-grammar
-                                      string)
-                             )
-           )
-             
-           )
-         )
-    )
-  )
+                                      string))))))
+
+(defn string-to-guessed-string
+  [processed-grammar string]  
+  (map #(-> % :phrase-seq phrase-seq-to-guessed-string)
+         (string-to-guessed-phrase-sequences processed-grammar string)))
