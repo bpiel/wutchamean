@@ -73,7 +73,7 @@
   (join " " (sort (split phrase #"[^\w\d']+"))))
 
 (defn calculate-distance [string1 string2]
-  (double (/ (- (count string1) 
+  (double (/ (- (count string1)
                 (damerau-levenshtein-distance (lower-case string1)
                                               (lower-case string2)))
              (count string1))))
@@ -137,7 +137,7 @@
                                   (pmap (fn [phrase-map] 
                                          (assoc phrase-map 
                                            :confidence (calculate-phrase-confidence phrase-map))))
-                                  (filter #(or (-> % :parent-confidence nil?) (> (:confidence %) (* 0.9 (:parent-confidence %)))))
+                                  (filter #(or (-> % :parent-confidence nil?) (> (:confidence %) (* 0.8 (:parent-confidence %)))))
                                   (filter #(< 0 (:confidence %))))]
       (recur tokens 
              (distinct (pmap #(dissoc % :parent-confidence)
@@ -155,7 +155,7 @@
                                   :confidence (calculate-phrase-confidence phrase-map)))
                               (get-stub-phrases-from-tokens processed-grammar tokens))]
     (filter #(> (:confidence %) 0.5) 
-            (assemble-phrases-recur tokens stub-phrase-maps stub-phrase-maps 5))))
+            (assemble-phrases-recur tokens stub-phrase-maps stub-phrase-maps 4))))
 
 (defn has-conflict [check-phrase phrase-seq]
   (if (empty? phrase-seq)

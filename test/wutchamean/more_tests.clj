@@ -71,7 +71,7 @@
             [assembled-phrases time4] (timer #(assemble-phrases processed-grammar tokens))
             [sorted-phrases time5] (timer (fn [] (sort #(> (:confidence %) (:confidence %2)) assembled-phrases)))
             [phrase-seq time6] (timer #(get-phrase-sequences sorted-phrases))
-            [sorted-phrase-seq time7] (timer #(order-by-confidence-phrase-sequences-from-assembled phrase-seq))
+            [sorted-phrase-seq time7] (timer #(order-by-confidence-phrase-sequences-from-assembled phrase-seq string))
             ]
       (println)
       (println "Execution time 1 :" time1)
@@ -82,7 +82,7 @@
       (println "Execution time 6 :" time6)
       (println "Execution time 7 :" time7)      
       (println)
-      (clojure.pprint/write result1)
+      ;(clojure.pprint/write result1)
         )
       1 => 1
       )
