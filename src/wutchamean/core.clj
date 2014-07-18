@@ -3,6 +3,10 @@
             [incanter.stats :refer :all]))
 
 
+(defn split-phrase-to-words
+  [phrase]
+  (filter not-empty (split phrase #"[^\w\d']+")))
+
 (defn split-words-in-phrase-list
   [phrase-list]
   (apply concat
@@ -10,7 +14,7 @@
                 (map-indexed (fn [idx word] 
                                [(lower-case word) {:phrase (second tuple) :index idx}])
                              (first tuple)))
-              (map #(vector (filter not-empty (split % #"[^\w\d']+")) %)
+              (map #(vector (split-phrase-to-words %) %)
                    phrase-list))))
 
 (defn process-grammar
