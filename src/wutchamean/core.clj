@@ -228,8 +228,7 @@
     (join " " (map :phrase phrase-seq)))
 
 (defn string-to-guessed-string
-  [grammar string]
-  (let [processed-grammar (process-grammar (:grammar grammar))]
+  [processed-grammar string]  
   (map #(-> % :phrase-seq phrase-seq-to-guessed-string)
          (order-by-confidence-phrase-sequences-from-assembled 
            (get-phrase-sequences
@@ -243,5 +242,4 @@
            )
          )
     )
-  )
   )

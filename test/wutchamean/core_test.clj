@@ -744,5 +744,6 @@
       => "dog cat hunted wumpus")
 
 (fact "string-to-guessed-string"
-      (string-to-guessed-string grammar "Dog cart wompus hutne")
+      (let [processed-grammar (process-grammar (:grammar grammar))]
+           (string-to-guessed-string processed-grammar  "Dog cart wompus hutne"))
       => ["dog cat hunted wumpus" "dog Cat Woman hunter" "dog cat hunter"])
