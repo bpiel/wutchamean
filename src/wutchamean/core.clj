@@ -206,24 +206,21 @@
   (get-phrase-sequences-recursive sorted-phrases [] nil 10))
 
 (defn calculate-phrase-seq-confidence 
-  [phrase-seq]  
+  [phrase-seq string]
   (let [sorted (sort #(< (:start-pos %)(:start-pos %2)) phrase-seq)
-        [expected-vec actual-vec] (reduce #(vector (concat (first %)(:original %2))
-                                           (concat (second %)(:phrase %2)))
-                                  [[] []]
-                                  sorted)
-        expected (join " " expected-vec)
-        actual (join " " actual-vec)
-        expected-sorted (join " " (sort expected-vec))
-        actual-sorted (join " " (sort actual-vec))]
-    
-    (max (calculate-distance expected actual)
-         (* 0.9 (calculate-distance expected-sorted actual-sorted)))))
+        l-string (lower-case string)
+        theory-vec (map :phrase sorted)
+        
+        theory (join " " theory-vec)
+        string-sorted (join " " (-> l-string split-phrase-to-words sort))
+        theory-sorted (join " " (sort theory-vec))]
+    (max (calculate-distance l-string theory)
+         (* 0.9 (calculate-distance string-sorted theory-sorted)))))
 
 
-(defn order-by-confidence-phrase-sequences-from-assembled [assembled-phrases]
+(defn order-by-confidence-phrase-sequences-from-assembled [assembled-phrases string]
   (sort #(< (:confidence %)(:confidence %2))
-        (pmap #(hash-map :confidence (calculate-phrase-seq-confidence %)
+        (pmap #(hash-map :confidence (calculate-phrase-seq-confidence % string)
                         :phrase-seq (sort (fn [ps1 ps2] (< (:start-pos ps1)(:start-pos ps2))) %))
              assembled-phrases)))
 
@@ -233,7 +230,7 @@
 
 (defn string-to-guessed-phrase-sequences
   [processed-grammar string]  
-  (order-by-confidence-phrase-sequences-from-assembled 
+  (order-by-confidence-phrase-sequences-from-assembled string
     (get-phrase-sequences
       (sort #(> (:confidence %) (:confidence %2)) ;order is backwards??
             (assemble-phrases processed-grammar

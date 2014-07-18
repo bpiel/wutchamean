@@ -668,8 +668,9 @@
                                           :original "wompus hutne",
                                           :phrase "hunted wumpus",
                                           :start-pos 2,
-                                          :words ["wompus" "hutne"]}])
-      => 0.6567567567567567)
+                                          :words ["wompus" "hutne"]}]
+                                       "Dog cart wompus hutne")
+      => 0.7285714285714286)
 
 (fact "order-by-confidence-phrase-sequences-from-assembled"
       (order-by-confidence-phrase-sequences-from-assembled
