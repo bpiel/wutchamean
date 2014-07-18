@@ -229,12 +229,12 @@
 
 (defn string-to-guessed-phrase-sequences
   [processed-grammar string]  
-         (order-by-confidence-phrase-sequences-from-assembled 
-           (get-phrase-sequences
-             (sort #(> (:confidence %) (:confidence %2))
-           (assemble-phrases processed-grammar
-                             (tokenize processed-grammar
-                                      string))))))
+  (order-by-confidence-phrase-sequences-from-assembled 
+    (get-phrase-sequences
+      (sort #(> (:confidence %) (:confidence %2)) ;order is backwards??
+            (assemble-phrases processed-grammar
+                              (tokenize processed-grammar
+                                        string))))))
 
 (defn string-to-guessed-string
   [processed-grammar string]  
