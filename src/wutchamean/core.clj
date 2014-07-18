@@ -10,18 +10,18 @@
 (defn split-words-in-phrase-list
   [phrase-list]
   (apply concat
-         (pmap (fn [tuple] 
+         (map (fn [tuple] 
                 (map-indexed (fn [idx word] 
                                [(lower-case word) {:phrase (second tuple) :index idx}])
                              (first tuple)))
-              (pmap #(vector (split-phrase-to-words %) %)
+              (map #(vector (split-phrase-to-words %) %)
                    phrase-list))))
 
 (defn process-grammar
   [grammar]
   (group-by first
-            (apply concat (pmap (fn [rule]
-                                 (pmap (fn [word-pair]
+            (apply concat (map (fn [rule]
+                                 (map (fn [word-pair]
                                         (assoc-in word-pair [1 :class] (first rule)))
                                       (split-words-in-phrase-list (second rule))))
                                (seq grammar)))))
@@ -36,8 +36,8 @@
   "Match a word to a set of tokens"
   [processed-grammar word]
   (filter #(>= (:confidence %) 0.5)
-          (pmap (fn [[word-match phrase-match]] (hash-map :confidence (calculate-confidence word word-match)
-                                                         :matches (pmap second phrase-match)
+          (map (fn [[word-match phrase-match]] (hash-map :confidence (calculate-confidence word word-match)
+                                                         :matches (map second phrase-match)
                                                          :match word-match))
                (seq processed-grammar))))
 
@@ -54,9 +54,9 @@
   [processed-grammar tokens]
   (apply concat 
          (apply concat 
-                (pmap (fn [[position token]]
-                       (pmap (fn [word-match]
-                              (pmap (fn [phrase-match]
+                (map (fn [[position token]]
+                       (map (fn [word-match]
+                              (map (fn [phrase-match]
                                      (hash-map :phrase (:phrase phrase-match)
                                                :start-pos (:position token)
                                                :end-pos (:position token)
@@ -122,9 +122,9 @@
   [tokens phrase-maps]
   
   (apply concat
-         (pmap (fn [phrase-map] 
+         (map (fn [phrase-map] 
                 (filter identity
-                        (pmap #(expand-one-phrase-map phrase-map tokens %)
+                        (map #(expand-one-phrase-map phrase-map tokens %)
                              [:left :right :both])))
               phrase-maps)))
 
@@ -134,13 +134,13 @@
            (not (empty? last-batch)))
     (if-let [new-phrase-maps (->> last-batch
                                   (expand-phrase-maps tokens)
-                                  (pmap (fn [phrase-map] 
+                                  (map (fn [phrase-map] 
                                          (assoc phrase-map 
                                            :confidence (calculate-phrase-confidence phrase-map))))
                                   (filter #(or (-> % :parent-confidence nil?) (> (:confidence %) (* 0.8 (:parent-confidence %)))))
                                   (filter #(< 0 (:confidence %))))]
       (recur tokens 
-             (distinct (pmap #(dissoc % :parent-confidence)
+             (distinct (map #(dissoc % :parent-confidence)
                             (concat phrase-maps new-phrase-maps))) 
              new-phrase-maps 
              (dec iterations))
@@ -150,7 +150,7 @@
 
 (defn assemble-phrases
   [processed-grammar tokens]
-  (let [stub-phrase-maps (pmap (fn [phrase-map] 
+  (let [stub-phrase-maps (map (fn [phrase-map] 
                                 (assoc phrase-map 
                                   :confidence (calculate-phrase-confidence phrase-map)))
                               (get-stub-phrases-from-tokens processed-grammar tokens))]
@@ -220,13 +220,13 @@
 
 (defn order-by-confidence-phrase-sequences-from-assembled [assembled-phrases string]
   (sort #(> (:confidence %)(:confidence %2))
-        (pmap #(hash-map :confidence (calculate-phrase-seq-confidence % string)
+        (map #(hash-map :confidence (calculate-phrase-seq-confidence % string)
                         :phrase-seq (sort (fn [ps1 ps2] (< (:start-pos ps1)(:start-pos ps2))) %))
              assembled-phrases)))
 
 (defn phrase-seq-to-guessed-string
     [phrase-seq]
-    (join " " (pmap :phrase phrase-seq)))
+    (join " " (map :phrase phrase-seq)))
 
 (defn string-to-guessed-phrase-sequences
   [processed-grammar string]  
@@ -240,5 +240,5 @@
 
 (defn string-to-guessed-string
   [processed-grammar string]  
-  (pmap #(-> % :phrase-seq phrase-seq-to-guessed-string)
+  (map #(-> % :phrase-seq phrase-seq-to-guessed-string)
          (string-to-guessed-phrase-sequences processed-grammar string)))
