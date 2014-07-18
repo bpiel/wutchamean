@@ -155,7 +155,7 @@
                                   :confidence (calculate-phrase-confidence phrase-map)))
                               (get-stub-phrases-from-tokens processed-grammar tokens))]
     (filter #(> (:confidence %) 0.5) 
-            (assemble-phrases-recur tokens stub-phrase-maps stub-phrase-maps 10))))
+            (assemble-phrases-recur tokens stub-phrase-maps stub-phrase-maps 5))))
 
 (defn has-conflict [check-phrase phrase-seq]
   (if (empty? phrase-seq)
@@ -219,7 +219,7 @@
 
 
 (defn order-by-confidence-phrase-sequences-from-assembled [assembled-phrases string]
-  (sort #(< (:confidence %)(:confidence %2))
+  (sort #(> (:confidence %)(:confidence %2))
         (pmap #(hash-map :confidence (calculate-phrase-seq-confidence % string)
                         :phrase-seq (sort (fn [ps1 ps2] (< (:start-pos ps1)(:start-pos ps2))) %))
              assembled-phrases)))
@@ -232,7 +232,7 @@
   [processed-grammar string]  
   (order-by-confidence-phrase-sequences-from-assembled
     (get-phrase-sequences
-      (sort #(> (:confidence %) (:confidence %2)) ;order is backwards??
+      (sort #(> (:confidence %) (:confidence %2))
             (assemble-phrases processed-grammar
                               (tokenize processed-grammar
                                         string))))

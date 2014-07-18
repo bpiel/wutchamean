@@ -748,12 +748,12 @@
 (fact "string-to-guessed-string"
       (let [processed-grammar (process-grammar (:grammar grammar))]
         (string-to-guessed-string processed-grammar "Dog cart wompus hutne"))
-      => ["dog cat hunter" "dog Cat Woman hunter" "dog cat hunted wumpus"])
+      => ["dog cat hunted wumpus" "dog Cat Woman hunter" "dog cat hunter"])
 
 (fact "string-to-guessed-phrase-sequences"
       (let [processed-grammar (process-grammar (:grammar grammar))]
         (string-to-guessed-phrase-sequences processed-grammar  "Dog cart wompus hutne"))
-      => [{:confidence 0.5238095238095238,
+      => [{:confidence 0.7285714285714286,
            :phrase-seq
            [{:class :animal,
              :confidence 1.0,
@@ -769,13 +769,13 @@
              :phrase "cat",
              :start-pos 1,
              :words ["cart"]}
-            {:class :person,
-             :confidence 0.6666666666666667,
+            {:class :animal,
+             :confidence 0.6923076923076923,
              :end-pos 3,
-             :original "hutne",
-             :phrase "hunter",
-             :start-pos 3,
-             :words ["hutne"]}]}
+             :original "wompus hutne",
+             :phrase "hunted wumpus",
+             :start-pos 2,
+             :words ["wompus" "hutne"]}]}
           {:confidence 0.7142857142857143,
            :phrase-seq
            [{:class :animal,
@@ -799,7 +799,7 @@
              :phrase "hunter",
              :start-pos 3,
              :words ["hutne"]}]}
-          {:confidence 0.7285714285714286,
+          {:confidence 0.5238095238095238,
            :phrase-seq
            [{:class :animal,
              :confidence 1.0,
@@ -815,10 +815,10 @@
              :phrase "cat",
              :start-pos 1,
              :words ["cart"]}
-            {:class :animal,
-             :confidence 0.6923076923076923,
+            {:class :person,
+             :confidence 0.6666666666666667,
              :end-pos 3,
-             :original "wompus hutne",
-             :phrase "hunted wumpus",
-             :start-pos 2,
-             :words ["wompus" "hutne"]}]}])
+             :original "hutne",
+             :phrase "hunter",
+             :start-pos 3,
+             :words ["hutne"]}]}])

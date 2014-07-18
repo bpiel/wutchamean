@@ -59,15 +59,30 @@
 (def processed-grammar (process-grammar (:grammar grammar)))
 
 (defn timer [f] 
-  (let [starttime (System/nanoTime)] 
-    (f)
-    (/ (- (System/nanoTime) starttime) 1e9))) 
+  (let [starttime (System/nanoTime)
+        output (f)] 
+    [ output (/ (- (System/nanoTime) starttime) 1e9)]))
 
-(fact "string-to-guessed-phrase-sequences"
-      
+#_(fact "profiling"
+      (let [string "change 1st time orders previous"
+            [result1 time1] (timer #(string-to-guessed-phrase-sequences processed-grammar  string))
+            [processed-grammar2 time2] (timer #(process-grammar (:grammar grammar)))
+            [tokens time3] (timer #(tokenize processed-grammar string))
+            [assembled-phrases time4] (timer #(assemble-phrases processed-grammar tokens))
+            [sorted-phrases time5] (timer (fn [] (sort #(> (:confidence %) (:confidence %2)) assembled-phrases)))
+            [phrase-seq time6] (timer #(get-phrase-sequences sorted-phrases))
+            [sorted-phrase-seq time7] (timer #(order-by-confidence-phrase-sequences-from-assembled phrase-seq))
+            ]
       (println)
-      (println "Execution time:" (timer #(string-to-guessed-phrase-sequences processed-grammar  "change 1st time orders previous 7 days")))
+      (println "Execution time 1 :" time1)
+      (println "Execution time 2 :" time2)
+      (println "Execution time 3 :" time3)
+      (println "Execution time 4 :" time4)
+      (println "Execution time 5 :" time5)
+      (println "Execution time 6 :" time6)
+      (println "Execution time 7 :" time7)      
       (println)
-      
+      (clojure.pprint/write result1)
+        )
       1 => 1
       )
